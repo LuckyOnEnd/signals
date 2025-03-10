@@ -1,4 +1,5 @@
 import asyncio
+import os
 from datetime import datetime, timedelta
 from decimal import Decimal, ROUND_DOWN
 
@@ -44,7 +45,8 @@ class TradingView:
         self.password=password
         self.options=self.chromeOptions()
         self.solver=TwoCaptcha(captcha_api)
-        self.driver=webdriver.Chrome(options=self.options, service=Service(ChromeDriverManager().install()))
+        chromedriver_path = os.path.abspath("services/chromedriver")
+        self.driver=webdriver.Chrome(options=self.options, service=Service(chromedriver_path))
         self.apply_sealth(self.driver)
         self.socket_manager = socket_manager
 
