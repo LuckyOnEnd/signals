@@ -1,4 +1,5 @@
 import asyncio
+import tempfile
 from datetime import datetime, timedelta
 from decimal import Decimal, ROUND_DOWN
 
@@ -52,11 +53,14 @@ class TradingView:
 
     @staticmethod
     def chromeOptions():
-        options=webdriver.ChromeOptions()
-        options.add_argument('--start-maximized')
+        options = webdriver.ChromeOptions()
+        options.add_argument('--headless')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        user_data_dir = tempfile.mkdtemp()
+        options.add_argument(f'--user-data-dir={user_data_dir}')
         options.add_argument('--incognito')
         options.add_argument('--disable-extensions')
-        #options.add_argument('--headless')
         return options
 
     @staticmethod
