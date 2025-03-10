@@ -1,5 +1,4 @@
 import asyncio
-import os
 from datetime import datetime, timedelta
 from decimal import Decimal, ROUND_DOWN
 
@@ -45,7 +44,8 @@ class TradingView:
         self.password=password
         self.options=self.chromeOptions()
         self.solver=TwoCaptcha(captcha_api)
-        chromedriver_path = os.path.abspath("services/chromedriver")
+        chromedriver_path = ChromeDriverManager().install()
+        print(f"{chromedriver_path}")
         self.driver=webdriver.Chrome(options=self.options, service=Service(chromedriver_path))
         self.apply_sealth(self.driver)
         self.socket_manager = socket_manager
@@ -56,7 +56,7 @@ class TradingView:
         options.add_argument('--start-maximized')
         options.add_argument('--incognito')
         options.add_argument('--disable-extensions')
-        options.add_argument('--headless')
+        #options.add_argument('--headless')
         return options
 
     @staticmethod
@@ -278,6 +278,12 @@ class TradingView:
                                 'PositionOpened': datetime.now().isoformat()
                             }
                             asyncio.run(socket_manager.broadcast(data))
+                            try:
+                                get_alert.click()
+                                self.driver.find_element(By.TAG_NAME, 'body').click()
+                            except ElementClickInterceptedException:
+                                print("Element click intercepted! Refreshing the page...")
+                                self.driver.refresh()
                         sleep(1)
                         continue
                 except StaleElementReferenceException as e:
