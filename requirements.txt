@@ -1,0 +1,7 @@
+FastAPI~=0.115.11
+uvicorn
+starlette~=0.46.0
+selenium~=4.29.0
+webdriver_manager
+webdriver-manager~=4.0.2
+TwoCaptcha~=0.0.1
