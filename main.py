@@ -1,7 +1,8 @@
 import threading
 from contextlib import asynccontextmanager
 from datetime import datetime
-
+import os
+from fastapi.responses import FileResponse
 from fastapi import FastAPI, HTTPException
 from starlette.middleware.cors import CORSMiddleware
 from starlette.websockets import WebSocket, WebSocketDisconnect
@@ -94,6 +95,13 @@ async def subscription(subscription_type: str, end_at: str, subscription_id: str
     except Exception as e:
         print(f"{e}")
 
+ZIP_FILE_PATH = "./project/app.zip"
+
+@app.get("/download")
+async def get_zip_file():
+    if os.path.exists(ZIP_FILE_PATH):
+        return FileResponse(ZIP_FILE_PATH, media_type="application/zip", headers={"Content-Disposition": "attachment; filename=items.zip"})
+    return {"error": "File not found"}
 
 @app.get('/get_subscription/{user_id}')
 async def get_subscription(user_id: str):
@@ -109,4 +117,3 @@ async def get_subscription(user_id: str):
     except Exception as e:
         print(f"Error fetching subscription: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch subscription")
-
