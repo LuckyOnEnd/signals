@@ -54,13 +54,19 @@ class TradingView:
     @staticmethod
     def chromeOptions():
         options = webdriver.ChromeOptions()
-        #options.add_argument('--headless')
-        options.add_argument('--no-sandbox')
-        options.add_argument('--disable-dev-shm-usage')
-        user_data_dir = tempfile.mkdtemp()
-        options.add_argument(f'--user-data-dir={user_data_dir}')
+        options.add_argument('--start-maximized')
         options.add_argument('--incognito')
         options.add_argument('--disable-extensions')
+        options.add_argument('--headless')
+        options.add_argument('--window-size=1920,1080')
+        options.add_argument('--disable-gpu')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument('--remote-debugging-port=9222')
+        options.add_argument('--enable-logging')
+        options.add_argument('--log-level=0')
+        options.add_argument('--disable-blink-features=AutomationControlled')
+        options.add_argument('--ignore-certificate-errors')
         return options
 
     @staticmethod
@@ -195,6 +201,10 @@ class TradingView:
             hide_repeat = 0
             while not self.stop_event.is_set():
                 try:
+                    sleep(2)  # Дает странице время подгрузить контент
+                    self.driver.get_screenshot_as_file("debug.png")
+                    sleep(2)  # Дает странице время подгрузить контент
+
                     get_alerts = WebDriverWait(self.driver, 20).until(
                         EC.visibility_of_all_elements_located((By.CSS_SELECTOR, alert_selector))
                     )
