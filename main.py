@@ -51,27 +51,30 @@ app.add_middleware(
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    await socket_manager.connect(websocket)
-    data = await websocket.receive_text()
     try:
-        params = dict(pair.split('=') for pair in data.split('&'))
-        email = params.get('email')
-        password = params.get('password')
+        await socket_manager.connect(websocket)
+        data = await websocket.receive_text()
+        try:
+            params = dict(pair.split('=') for pair in data.split('&'))
+            email = params.get('email')
+            password = params.get('password')
 
-        if not email or not password:
-            raise HTTPException(status_code=400, detail="Email and password are required.")
+            if not email or not password:
+                raise HTTPException(status_code=400, detail="Email and password are required.")
 
-        if not validate_credentials(email, password):
-            raise HTTPException(status_code=401, detail="Invalid credentials.")
+            if not validate_credentials(email, password):
+                raise HTTPException(status_code=401, detail="Invalid credentials.")
 
-        while True:
-            await websocket.receive_text()
+            while True:
+                await websocket.receive_text()
 
-    except WebSocketDisconnect:
-        socket_manager.disconnect(websocket)
-        await socket_manager.broadcast(
-            f"User disconnected: {len(socket_manager.active_connections)} active users"
-            )
+        except WebSocketDisconnect:
+            socket_manager.disconnect(websocket)
+            await socket_manager.broadcast(
+                f"User disconnected: {len(socket_manager.active_connections)} active users"
+                )
+    except Exception as ex:
+        print(ex)
 
 
 def validate_credentials(email: str, password: str) -> bool:
@@ -117,3 +120,5 @@ async def get_subscription(user_id: str):
     except Exception as e:
         print(f"Error fetching subscription: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch subscription")
+
+print('started')
