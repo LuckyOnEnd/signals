@@ -3,16 +3,15 @@ from contextlib import asynccontextmanager
 from datetime import datetime
 import os
 from fastapi.responses import FileResponse
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from starlette.middleware.cors import CORSMiddleware
 from starlette.websockets import WebSocket, WebSocketDisconnect
-
+from starlette.responses import StreamingResponse
 from config import Config
 from services.firebase import login_user, db
 from services.notification import socket_manager
 from services.trading_view import TradingView
 from firebase_admin import firestore
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     stop_event = threading.Event()
@@ -100,11 +99,26 @@ async def subscription(subscription_type: str, end_at: str, subscription_id: str
 
 ZIP_FILE_PATH = "./project/app.zip"
 
+ZIP_FILE_PATH = "./project/app.zip"
+
+def file_iterator(file_path, chunk_size=1024 * 1024):
+    with open(file_path, "rb") as file:
+        while chunk := file.read(chunk_size):
+            yield chunk
+
 @app.get("/download")
 async def get_zip_file():
     if os.path.exists(ZIP_FILE_PATH):
-        return FileResponse(ZIP_FILE_PATH, media_type="application/zip", headers={"Content-Disposition": "attachment; filename=items.zip"})
-    return {"error": "File not found"}
+        return StreamingResponse(
+            file_iterator(ZIP_FILE_PATH),
+            media_type="application/zip",
+            headers={
+                "Content-Disposition": "attachment; filename=items.zip",
+                "Content-Length": str(os.path.getsize(ZIP_FILE_PATH)),
+                "Accept-Ranges": "bytes",
+            }
+        )
+    return Response(content="File not found", status_code=404)
 
 @app.get('/get_subscription/{user_id}')
 async def get_subscription(user_id: str):
