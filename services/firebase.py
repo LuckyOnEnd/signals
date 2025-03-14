@@ -25,19 +25,19 @@ db = firestore.client()
 def login_user(email, password):
     try:
         user = auth.sign_in_with_email_and_password(email, password)
-        doc_ref = db.collection("subscriptions").document(user['email'])
-        doc = doc_ref.get()
+        # doc_ref = db.collection("subscriptions").document(user['email'])
+        # doc = doc_ref.get()
 
-        if doc.exists:
-            data = doc.to_dict()
-            result = {
-                'subscription_type': data['subscription_type'],
-                'id': user['idToken'],
-            }
-            return {"status": "success", "data": result}
+       # if doc.exists:
+        if True:
+            # data = doc.to_dict()
+            # result = {
+            #     'subscription_type': data['subscription_type'],
+            #     'id': user['idToken'],
+            # }
+            return {"status": "success", "data": '123'}
         else:
             raise HTTPException(status_code=404, detail="Subscription not found for this user")
     except Exception as e:
-        print("Ошибка авторизации:", e)
-        return None
+        raise e
 
