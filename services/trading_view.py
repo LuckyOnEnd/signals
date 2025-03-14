@@ -50,6 +50,7 @@ class TradingView:
         self.driver=webdriver.Chrome(options=self.options, service=Service(chromedriver_path))
         self.apply_sealth(self.driver)
         self.socket_manager = socket_manager
+        print('Launched')
 
     @staticmethod
     def chromeOptions():
@@ -196,6 +197,8 @@ class TradingView:
     # analyzing the chart
     def analyzeChart(self):
         try:
+            print('analyze chart')
+
             alert_selector = '.highlighted-ucBqatk5'
             last_signal = None
             hide_repeat = 0
@@ -214,7 +217,6 @@ class TradingView:
                         if not msg.strip():
                             continue
 
-                        print(f"\n\nAlert received: {msg}\nTime {datetime.now()}\n\n")
                         # if msg == 'This website uses cookies. Our policy.\nManage\nAccept all':
                         #     close_buttons = get_alert.find_elements(
                         #         By.XPATH,
@@ -292,6 +294,7 @@ class TradingView:
                                 'PositionOpened': datetime.now().isoformat()
                             }
                             asyncio.run(socket_manager.broadcast(data))
+                            print(f"Sending sockets: {data}")
                             try:
                                 get_alert.click()
                                 self.driver.find_element(By.TAG_NAME, 'body').click()
