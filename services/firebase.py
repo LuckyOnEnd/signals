@@ -35,7 +35,10 @@ def login_user(email, password):
             #     'subscription_type': data['subscription_type'],
             #     'id': user['idToken'],
             # }
-            return {"status": "success", "data": '123'}
+            return {"status": "success", "data": {
+                'subscription_type': 'essential',
+                'id': '123321123'
+            }}
         else:
             raise HTTPException(status_code=404, detail="Subscription not found for this user")
     except Exception as e:
