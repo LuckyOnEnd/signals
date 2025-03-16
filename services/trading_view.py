@@ -58,7 +58,7 @@ class TradingView:
         options.add_argument('--start-maximized')
         options.add_argument('--incognito')
         options.add_argument('--disable-extensions')
-        options.add_argument('--headless')
+        #todo options.add_argument('--headless')
         options.add_argument('--window-size=1920,1080')
         options.add_argument('--disable-gpu')
         options.add_argument('--no-sandbox')
@@ -208,6 +208,16 @@ class TradingView:
                     self.driver.get_screenshot_as_file("debug.png")
                     sleep(2)  # Дает странице время подгрузить контент
 
+                    try:
+                        WebDriverWait(self.driver, 5).until(
+                            EC.presence_of_element_located(
+                                (By.XPATH, "//div[contains(text(), 'Session disconnected')]")
+                                )
+                        )
+                        print("Session disconnected detected! Refreshing the page...")
+                        self.driver.refresh()
+                    except:
+                        print("No session disconnection detected, continuing...")
                     get_alerts = WebDriverWait(self.driver, 20).until(
                         EC.visibility_of_all_elements_located((By.CSS_SELECTOR, alert_selector))
                     )
