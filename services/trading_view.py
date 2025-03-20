@@ -200,8 +200,8 @@ class TradingView:
             print('analyze chart')
 
             alert_selector = '.highlighted-ucBqatk5'
-            last_signal = None
-            hide_repeat = 0
+            last_signals = {}
+            hide_repeat_map = {}
             while not self.stop_event.is_set():
                 try:
                     sleep(2)  # Дает странице время подгрузить контент
@@ -276,26 +276,32 @@ class TradingView:
                             print('')
 
                         if signal:
-                            print(f'Received {signal} f{datetime.now()}')
-                            if last_signal == signal:
-                                hide_repeat += 1
-                                if hide_repeat >= 10:
-                                    print(f'Last signal was receiver {signal} {datetime.now()}')
+                            symbol = None
+                            if ".P" in symbol_value:
+                                symbol = symbol_value.split(".P")[0]
+
+                            print(f'Received {signal} {symbol} {datetime.now()}')
+
+                            if symbol in last_signals and last_signals[symbol] == signal:
+                                hide_repeat_map[symbol] = hide_repeat_map.get(symbol, 0) + 1
+
+                                if hide_repeat_map[symbol] >= 10:
+                                    print(
+                                        f'Last signal was received {signal} for {symbol} at {datetime.now()}'
+                                        )
                                     try:
                                         get_alert.click()
                                         self.driver.find_element(By.TAG_NAME, 'body').click()
-                                        hide_repeat = 0
+                                        hide_repeat_map[
+                                            symbol] = 0
                                     except ElementClickInterceptedException:
                                         print("Element click intercepted! Refreshing the page...")
                                         self.driver.refresh()
-                                        hide_repeat = 0
+                                        hide_repeat_map[symbol] = 0
                                 continue
 
-                            last_signal = signal
-
-                            symbol = None
-                            if symbol_value.__contains__(".P"):
-                                symbol = symbol_value.split(".P")[0]
+                            last_signals[symbol] = signal
+                            hide_repeat_map[symbol] = 0
 
                             data = {
                                 'Symbol': symbol,
