@@ -279,6 +279,8 @@ class TradingView:
                             symbol = None
                             if ".P" in symbol_value:
                                 symbol = symbol_value.split(".P")[0]
+                            else:
+                                symbol = symbol_value
 
                             print(f'Received {signal} {symbol} {datetime.now()}')
 
