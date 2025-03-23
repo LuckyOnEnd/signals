@@ -224,9 +224,9 @@ class TradingView:
                     get_alerts = get_alerts[::-1]
                     for get_alert in get_alerts:
                         msg = get_alert.text
+                        print(msg)
                         if not msg.strip():
                             continue
-
                         # if msg == 'This website uses cookies. Our policy.\nManage\nAccept all':
                         #     close_buttons = get_alert.find_elements(
                         #         By.XPATH,
