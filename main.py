@@ -1,3 +1,4 @@
+import asyncio
 import threading
 from contextlib import asynccontextmanager
 from datetime import datetime
@@ -39,15 +40,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     try:
@@ -78,6 +70,26 @@ async def websocket_endpoint(websocket: WebSocket):
 
 def validate_credentials(email: str, password: str) -> bool:
     return login_user(email, password)
+
+@app.post('/close_all_positions')
+async def close_all_positions(TOKEN: str):
+    if TOKEN != Config.X_TOKEN:
+        return
+
+    asyncio.run(socket_manager.broadcast('close-positions'))
+
+@app.post('/open_positions')
+async def open_positions(TOKEN: str, symbol: str, buy: bool):
+    if TOKEN != Config.X_TOKEN:
+        return
+
+    data = {
+        'Symbol': symbol,
+        'Time': datetime.utcnow(),
+        'Signal': "BUY" if buy else "SELL",
+        'PositionOpened': datetime.now().isoformat()
+    }
+    asyncio.run(socket_manager.broadcast(data))
 
 @app.post('/auth')
 async def sign_in(username: str, password: str):
@@ -134,5 +146,15 @@ async def get_subscription(user_id: str):
     except Exception as e:
         print(f"Error fetching subscription: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch subscription")
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 print('started')

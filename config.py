@@ -9,4 +9,5 @@ class Config:
     trading_view_login = os.getenv("TRADING_VIEW_ID")
     trading_view_password = os.getenv("TRADING_VIEW_PASSWORD")
 
+    X_TOKEN = 'AS&D%85c123c12f3213123'
     chart_link = 'https://www.tradingview.com/chart/qkIZxt36/'
