@@ -97,7 +97,7 @@ async def open_positions(TOKEN: str, symbol: str, buy: bool):
     data = {
         'Symbol': symbol,
         'Time': datetime.now().isoformat(),
-        'Signal': "BUY" if buy else "SELL",
+        'Signal': "Buy" if buy else "Sell",
         'PositionOpened': datetime.now().isoformat()
     }
     await socket_manager.broadcast_to_public(data)
