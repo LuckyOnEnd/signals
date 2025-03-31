@@ -1,4 +1,5 @@
 import asyncio
+import json
 import threading
 from contextlib import asynccontextmanager
 from datetime import datetime
@@ -99,7 +100,8 @@ async def open_positions(TOKEN: str, symbol: str, buy: bool):
         'Signal': "BUY" if buy else "SELL",
         'PositionOpened': datetime.now().isoformat()
     }
-    await socket_manager.broadcast_to_public(data)
+    json_data = json.dumps(data, default=str)
+    await socket_manager.broadcast_to_public(json_data)
 
 @app.post('/auth')
 async def sign_in(username: str, password: str):

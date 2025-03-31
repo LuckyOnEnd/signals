@@ -26,6 +26,7 @@ class SocketManager:
 
     async def broadcast_to_public(self, message):
         for connection in self.public_connections:
+            print('Send to public')
             await connection.send_json(message)
 
     async def broadcast_all(self, message):
