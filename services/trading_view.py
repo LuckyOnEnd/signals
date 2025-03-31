@@ -90,7 +90,6 @@ class TradingView:
     def call_enter_credentials(self):
         try:
             try:
-                return #todo
                 sleep(1)
                 email_btn=WebDriverWait(self.driver,10).until(EC.visibility_of_element_located((By.XPATH,'/html/body/div[8]/div/div/div[1]/div/div[2]/div[2]/div/div/button')))
                 email_btn.click()
