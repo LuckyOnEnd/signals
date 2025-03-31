@@ -98,10 +98,9 @@ async def open_positions(TOKEN: str, symbol: str, buy: bool):
         'Symbol': symbol,
         'Time': datetime.utcnow(),
         'Signal': "BUY" if buy else "SELL",
-        'PositionOpened': datetime.now().isoformat()
+        'PositionOpened': str(datetime.now().isoformat())
     }
-    json_data = json.dumps(data, default=str)
-    await socket_manager.broadcast_to_public(json_data)
+    await socket_manager.broadcast_to_public(data)
 
 @app.post('/auth')
 async def sign_in(username: str, password: str):
