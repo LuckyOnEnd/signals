@@ -86,7 +86,7 @@ async def close_all_positions(TOKEN: str):
     if TOKEN != Config.X_TOKEN:
         return
 
-    asyncio.run(socket_manager.broadcast_to_public('close-positions'))
+    await socket_manager.broadcast_to_public('close-positions')
 
 @app.post('/open_positions')
 async def open_positions(TOKEN: str, symbol: str, buy: bool):
@@ -99,7 +99,7 @@ async def open_positions(TOKEN: str, symbol: str, buy: bool):
         'Signal': "BUY" if buy else "SELL",
         'PositionOpened': datetime.now().isoformat()
     }
-    asyncio.run(socket_manager.broadcast_to_public(data))
+    await socket_manager.broadcast_to_public(data)
 
 @app.post('/auth')
 async def sign_in(username: str, password: str):
