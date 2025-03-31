@@ -204,9 +204,9 @@ class TradingView:
             hide_repeat_map = {}
             while not self.stop_event.is_set():
                 try:
-                    sleep(2)  # Дает странице время подгрузить контент
+                    sleep(2)
                     self.driver.get_screenshot_as_file("debug.png")
-                    sleep(2)  # Дает странице время подгрузить контент
+                    sleep(2)
 
                     try:
                         WebDriverWait(self.driver, 5).until(
@@ -311,7 +311,7 @@ class TradingView:
                                 'Signal': signal,
                                 'PositionOpened': datetime.now().isoformat()
                             }
-                            asyncio.run(socket_manager.broadcast(data))
+                            asyncio.run(socket_manager.broadcast_to_authenticated(data))
                             print(f"Sending sockets: {data}")
                             try:
                                 get_alert.click()

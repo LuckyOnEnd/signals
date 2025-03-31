@@ -40,10 +40,20 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+
+@app.websocket("/ws-public")
+async def websocket_public_endpoint(websocket: WebSocket):
+    try:
+        await socket_manager.connect(websocket, is_public=True)
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        socket_manager.disconnect(websocket)
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     try:
-        await socket_manager.connect(websocket)
+        await socket_manager.connect(websocket, is_public=False)
         data = await websocket.receive_text()
         try:
             params = dict(pair.split('=') for pair in data.split('&'))
@@ -61,7 +71,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
         except WebSocketDisconnect:
             socket_manager.disconnect(websocket)
-            await socket_manager.broadcast(
+            await socket_manager.broadcast_to_authenticated(
                 f"User disconnected: {len(socket_manager.active_connections)} active users"
                 )
     except Exception as ex:
@@ -76,7 +86,7 @@ async def close_all_positions(TOKEN: str):
     if TOKEN != Config.X_TOKEN:
         return
 
-    asyncio.run(socket_manager.broadcast('close-positions'))
+    asyncio.run(socket_manager.broadcast_to_public('close-positions'))
 
 @app.post('/open_positions')
 async def open_positions(TOKEN: str, symbol: str, buy: bool):
@@ -89,7 +99,7 @@ async def open_positions(TOKEN: str, symbol: str, buy: bool):
         'Signal': "BUY" if buy else "SELL",
         'PositionOpened': datetime.now().isoformat()
     }
-    asyncio.run(socket_manager.broadcast(data))
+    asyncio.run(socket_manager.broadcast_to_public(data))
 
 @app.post('/auth')
 async def sign_in(username: str, password: str):
