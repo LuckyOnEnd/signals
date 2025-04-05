@@ -83,18 +83,23 @@ def validate_credentials(email: str, password: str) -> bool:
     return login_user(email, password)
 
 @app.post('/close_all_positions')
-async def close_all_positions(TOKEN: str):
-    if TOKEN != Config.X_TOKEN:
-        return
-
-    await socket_manager.broadcast_to_public('close-positions')
-
-@app.post('/open_positions')
-async def open_positions(TOKEN: str, symbol: str, buy: bool):
+async def close_all_positions(TOKEN: str, broker: str):
     if TOKEN != Config.X_TOKEN:
         return
 
     data = {
+        'Broker': broker,
+        'close-positions': True
+    }
+    await socket_manager.broadcast_to_public(data)
+
+@app.post('/open_positions')
+async def open_positions(TOKEN: str, symbol: str, buy: bool, broker: str):
+    if TOKEN != Config.X_TOKEN:
+        return
+
+    data = {
+        'Broker': broker,
         'Symbol': symbol,
         'Time': datetime.now().isoformat(),
         'Signal': "Buy" if buy else "Sell",
