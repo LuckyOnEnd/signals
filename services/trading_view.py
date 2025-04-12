@@ -2,6 +2,7 @@ import asyncio
 import tempfile
 from datetime import datetime, timedelta
 from decimal import Decimal, ROUND_DOWN
+import uuid
 
 from selenium import webdriver
 from selenium.common.exceptions import (
