@@ -3,8 +3,8 @@ import os
 
 class Config:
     captcha_api = '20889fecf36a0d81df702d81119d8f03'
-    username = 'viacheslavmw861@gmail.com'
-    password = 'AdminTestUser123@'
+    username = 'cys550301200@gmail.com'
+    password = 'Mm9090!@#~~~'
 
     trading_view_login = os.getenv("TRADING_VIEW_ID")
     trading_view_password = os.getenv("TRADING_VIEW_PASSWORD")
