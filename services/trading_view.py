@@ -44,6 +44,7 @@ class TradingView:
         self.chart_link = chart_link
         self.username=username
         self.password=password
+        print('Chrome options set started')
         self.options=self.chromeOptions()
         self.solver=TwoCaptcha(captcha_api)
         chromedriver_path = ChromeDriverManager().install()
