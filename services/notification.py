@@ -22,6 +22,7 @@ class SocketManager:
 
     async def broadcast_to_authenticated(self, message):
         for connection in self.authenticated_connections:
+            print(f'Sent to {connection} {message}')
             await connection.send_json(message)
 
     async def broadcast_to_public(self, message):

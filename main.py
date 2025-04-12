@@ -73,7 +73,7 @@ async def websocket_endpoint(websocket: WebSocket):
         except WebSocketDisconnect:
             socket_manager.disconnect(websocket)
             await socket_manager.broadcast_to_authenticated(
-                f"User disconnected: {len(socket_manager.active_connections)} active users"
+                f"User disconnected: {len(socket_manager.authenticated_connections)} active users"
                 )
     except Exception as ex:
         print(ex)
