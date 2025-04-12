@@ -68,8 +68,9 @@ class TradingView:
         options.add_argument('--log-level=0')
         options.add_argument('--disable-blink-features=AutomationControlled')
         options.add_argument('--ignore-certificate-errors')
-        temp_profile_dir = tempfile.mkdtemp()
-        options.add_argument(f"--user-data-dir={temp_profile_dir}")
+
+        unique_profile_dir = tempfile.mkdtemp(prefix=f"chrome_profile_{uuid.uuid4()}")
+        options.add_argument(f"--user-data-dir={unique_profile_dir}")
         return options
 
     @staticmethod
