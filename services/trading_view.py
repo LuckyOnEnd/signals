@@ -37,6 +37,7 @@ class TradingView:
             chart_link,
             socket_manager
     ):
+        print('TradingViewStarted')
         if not captcha_api or not username or not password:
             raise ValueError("Captcha_API, Username, and Password must be provided.")
 
