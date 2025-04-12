@@ -58,8 +58,8 @@ class TradingView:
     @staticmethod
     def chromeOptions():
         options = webdriver.ChromeOptions()
-        # unique_profile_dir = tempfile.mkdtemp(prefix=f"chrome_profile_{uuid.uuid4()}")
-        # options.add_argument(f"--user-data-dir={unique_profile_dir}")
+        user_data_dir = tempfile.mkdtemp()
+        options.add_argument(f"--user-data-dir={user_data_dir}")
         options.add_argument('--start-maximized')
         options.add_argument('--incognito')
         options.add_argument('--disable-extensions')
