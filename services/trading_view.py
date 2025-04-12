@@ -21,6 +21,7 @@ from twocaptcha import TwoCaptcha
 from time import sleep
 import random
 
+from logger_config import logger
 from services.notification import socket_manager
 
 
@@ -37,7 +38,7 @@ class TradingView:
             chart_link,
             socket_manager
     ):
-        print('TradingViewStarted')
+        logger.info('TradingViewStarted')
         if not captcha_api or not username or not password:
             raise ValueError("Captcha_API, Username, and Password must be provided.")
 
@@ -45,15 +46,15 @@ class TradingView:
         self.chart_link = chart_link
         self.username=username
         self.password=password
-        print('Chrome options set started')
+        logger.info('Chrome options set started')
         self.options=self.chromeOptions()
         self.solver=TwoCaptcha(captcha_api)
         chromedriver_path = ChromeDriverManager().install()
-        print(f"{chromedriver_path}")
+        logger.info(f"{chromedriver_path}")
         self.driver=webdriver.Chrome(options=self.options, service=Service(chromedriver_path))
         self.apply_sealth(self.driver)
         self.socket_manager = socket_manager
-        print('Launched')
+        logger.info('Launched')
 
     @staticmethod
     def chromeOptions():
@@ -91,7 +92,7 @@ class TradingView:
           result=self.solver.solve_captcha(site_key='6Lcqv24UAAAAAIvkElDvwPxD0R8scDnMpizaBcHQ',page_url='https://www.tradingview.com/')
           return result
         except Exception as e:
-            print('got an exception whilen solving the captcha')
+            logger.info('got an exception whilen solving the captcha')
 
     def call_enter_credentials(self):
         try:
@@ -144,12 +145,12 @@ class TradingView:
 
                     sleep(4)
                 except TimeoutException as e:
-                    print('Got An Undected Captcha')
+                    logger.info('Got An Undected Captcha')
             except TimeoutException as e:
-                print('click by email button unable to track')
+                logger.info('click by email button unable to track')
 
         except Exception as e:
-            print('got exception from call_enter_credentials*()',e)
+            logger.info('got exception from call_enter_credentials*()',e)
 
     def login(self):
         try:
@@ -184,9 +185,9 @@ class TradingView:
                 except TimeoutException:
                     pass
              except TimeoutException as e:
-                print('we unable to look signin link')
+                logger.info('we unable to look signin link')
          except TimeoutException as e:
-             print('sign_up_btn not found')
+             logger.info('sign_up_btn not found')
         except Exception as e:
             raise
 
@@ -203,7 +204,7 @@ class TradingView:
     # analyzing the chart
     def analyzeChart(self):
         try:
-            print('analyze chart')
+            logger.info('analyze chart')
 
             alert_selector = '.highlighted-ucBqatk5'
             last_signals = {}
@@ -220,17 +221,17 @@ class TradingView:
                                 (By.XPATH, "//div[contains(text(), 'Session disconnected')]")
                                 )
                         )
-                        print("Session disconnected detected! Refreshing the page...")
+                        logger.info("Session disconnected detected! Refreshing the page...")
                         self.driver.refresh()
                     except:
-                        print("No session disconnection detected, continuing...")
+                        logger.info("No session disconnection detected, continuing...")
                     get_alerts = WebDriverWait(self.driver, 20).until(
                         EC.visibility_of_all_elements_located((By.CSS_SELECTOR, alert_selector))
                     )
                     get_alerts = get_alerts[::-1]
                     for get_alert in get_alerts:
                         msg = get_alert.text
-                        print(msg)
+                        logger.info(msg)
                         if not msg.strip():
                             continue
                         # if msg == 'This website uses cookies. Our policy.\nManage\nAccept all':
@@ -260,7 +261,7 @@ class TradingView:
                                     )
                                 time = get_time.text
                             except TimeoutException as e:
-                                print('Miss Time')
+                                logger.info('Miss Time')
 
                         if not symbol_value:
                             symbol_value = self.get_symbol(get_alert)
@@ -279,7 +280,7 @@ class TradingView:
                         elif 'SSL Signal'.lower() in msg.lower():
                             signal = 'SSL'
                         else:
-                            print('')
+                            logger.info('')
 
                         if signal:
                             symbol = None
@@ -294,7 +295,7 @@ class TradingView:
                                 hide_repeat_map[symbol] = hide_repeat_map.get(symbol, 0) + 1
 
                                 if hide_repeat_map[symbol] >= 10:
-                                    print(
+                                    logger.info(
                                         f'Last signal was received {signal} for {symbol} at {datetime.now()}'
                                         )
                                     try:
@@ -303,7 +304,7 @@ class TradingView:
                                         hide_repeat_map[
                                             symbol] = 0
                                     except ElementClickInterceptedException:
-                                        print("Element click intercepted! Refreshing the page...")
+                                        logger.info("Element click intercepted! Refreshing the page...")
                                         self.driver.refresh()
                                         hide_repeat_map[symbol] = 0
                                 continue
@@ -318,7 +319,7 @@ class TradingView:
                                 'PositionOpened': datetime.now().isoformat()
                             }
                             asyncio.run(socket_manager.broadcast_to_authenticated(data))
-                            print(f"Sending sockets: {data}")
+                            logger.info(f"Sending sockets: {data}")
                             try:
                                 get_alert.click()
                                 self.driver.find_element(By.TAG_NAME, 'body').click()

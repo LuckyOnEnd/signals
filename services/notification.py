@@ -2,6 +2,9 @@ from typing import List
 
 from starlette.websockets import WebSocket
 
+from logger_config import logger
+
+
 class SocketManager:
     def __init__(self):
         self.authenticated_connections: List[WebSocket] = []
@@ -22,7 +25,7 @@ class SocketManager:
 
     async def broadcast_to_authenticated(self, message):
         for connection in self.authenticated_connections:
-            print(f'Sent to {connection} {message}')
+            logger.info(f'Sent to {connection} {message}')
             await connection.send_json(message)
 
     async def broadcast_to_public(self, message):
